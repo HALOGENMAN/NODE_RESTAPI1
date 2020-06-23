@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv")
 const morgan = require("morgan")
 const mongoose = require("mongoose")
+const bodyParser = require("body-parser")
 const app = express()
 
 MONGOOSE_URI='mongodb+srv://shayak:159951sm357753@cluster0-fidtq.mongodb.net/api1?retryWrites=true&w=majority'
@@ -20,11 +21,19 @@ const { request } = require("http");
 if(process.env.NODE_ENV === 'development'){
     app.use(morgan('dev'))
 }
+
+// app.use(bodyParser.urlencoded({extended:false}))
+app.use(express.json()) //body parser built in in express
+
 app.use('/api/v1/bootcamps',bootcamps)
+
+app.use((err,req,res,next)=>{
+    res.status(500).json({error:err})
+})
 
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect(MONGOOSE_URI)
+mongoose.connect(process.env.MONGOOSE_URI)
     .then(()=>{
         app.listen(PORT)
         console.log("CONNECTED!")
